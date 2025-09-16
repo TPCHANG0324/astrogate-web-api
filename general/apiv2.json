@@ -566,9 +566,9 @@
                         "devName": "AS201-0024",
                         "deviceNameShow": true,
                         "ipShow": true,
-                        "miracastPinCode": false,
-                        "slideshowEnabled": false,
-                        "slideshowInterval": 30
+                        "miracastPinEnabled": false,
+                        "imageSliderEnabled": false,
+                        "imageSliderInterval": 30
                       },
                       "errorCode": 0,
                       "isSuccess": true,
@@ -2462,7 +2462,7 @@
                         "ssid": "AS201-003a",
                         "security": 0,
                         "password": "",
-                        "autoPresent": false
+                        "autoProjection": false
                       },
                       "errorCode": 0,
                       "isSuccess": true,
@@ -2479,7 +2479,7 @@
                         "ssid": "Astrogate_Unknown",
                         "security": 0,
                         "password": "",
-                        "autoPresent": false
+                        "autoProjection": false
                       },
                       "errorCode": 0,
                       "isSuccess": true,
@@ -2496,7 +2496,7 @@
                         "ssid": "Astrogate_Unknown",
                         "security": 1,
                         "password": "qwer!!test",
-                        "autoPresent": false
+                        "autoProjection": false
                       },
                       "errorCode": 0,
                       "isSuccess": true,
@@ -2513,7 +2513,7 @@
                         "ssid": "Astrogate_Unknown",
                         "security": 2,
                         "password": "qwer!!test",
-                        "autoPresent": false
+                        "autoProjection": false
                       },
                       "errorCode": 0,
                       "isSuccess": true,
@@ -2522,7 +2522,7 @@
                     }
                   },
                   "Success_4": {
-                    "summary": "Success > other and WPA3 Mixed",
+                    "summary": "Success > other and WPA3/WPA2 mixed mode",
                     "value": {
                       "data": {
                         "mode": 1,
@@ -2530,7 +2530,7 @@
                         "ssid": "Astrogate_Unknown",
                         "security": 3,
                         "password": "qwer!!test",
-                        "autoPresent": false
+                        "autoProjection": false
                       },
                       "errorCode": 0,
                       "isSuccess": true,
@@ -3422,12 +3422,12 @@
         }
       }
     },
-    "/api/v2/station/conference/appvc": {
+    "/api/v2/station/conference/appBYOM": {
       "get": {
         "tags": [
           "Conference"
         ],
-        "description": "Retrieve AppVC activation status",
+        "description": "Retrieve appBYOM activation status",
         "responses": {
           "200": {
             "description": "Success",
@@ -3532,7 +3532,7 @@
         "tags": [
           "Conference"
         ],
-        "description": "Activate AppVC Key",
+        "description": "Activate appBYOM Key",
         "parameters": [
           {
             "$ref": "#/components/parameters/userParameter"
@@ -3556,8 +3556,8 @@
                   },
                   "type": {
                     "type": "string",
-                    "description": "Currently fixed to use appvc",
-                    "example": "appvc"
+                    "description": "Currently fixed to use appBYOM",
+                    "example": "appBYOM"
                   }
                 }
               }
@@ -3744,15 +3744,15 @@
               3
             ]
           },
-          "miracastPinCode": {
+          "miracastPinEnabled": {
             "type": "boolean",
             "example": false
           },
-          "slideshowEnabled": {
+          "imageSliderEnabled": {
             "type": "boolean",
             "example": false
           },
-          "slideshowInterval": {
+          "imageSliderInterval": {
             "type": "integer",
             "example": 30,
             "description": "Use seconds: 10, 30, 45"
@@ -4062,14 +4062,14 @@
           "security": {
             "type": "integer",
             "example": 0,
-            "description": "0-none、1-WPA2、2-WPA3、3-WPA3 Mixed"
+            "description": "0-none、1-WPA2、2-WPA3、3-WPA3/WPA2 mixed mode"
           },
           "password": {
             "type": "string",
             "example": "qwer!!test",
             "description": "No restrictions, as the user's SSID password may contain various special characters"
           },
-          "autoPresent": {
+          "autoProjection": {
             "type": "boolean",
             "example": false
           }
