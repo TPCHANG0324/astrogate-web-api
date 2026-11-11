@@ -1,0 +1,5801 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "3.0.1",
+    "title": "Astrogate ASTROS Station RESTful API",
+    "description": "The API for ASTROS Station.",
+    "contact": {
+      "name": "System Developer",
+      "email": "systemdeveloper@astrogate.com",
+      "url": "https://www.astrogate.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "description": "Astrogate ASTROS Station",
+      "url": "https://{environment}:{port}",
+      "variables": {
+        "environment": {
+          "description": "Enter the environment manually",
+          "default": "AS301-abdd"
+        },
+        "port": {
+          "default": "443",
+          "enum": [
+            "443",
+            "8443"
+          ]
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "name": "BeforeLogin",
+      "description": "Actions other than logging into the settings page do not require a token"
+    },
+    {
+      "name": "Login"
+    },
+    {
+      "name": "Global"
+    },
+    {
+      "name": "Upload"
+    },
+    {
+      "name": "General"
+    },
+    {
+      "name": "HDMI & Type-C"
+    },
+    {
+      "name": "DateTime"
+    },
+    {
+      "name": "Wi-Fi"
+    },
+    {
+      "name": "Ethernet"
+    },
+    {
+      "name": "Update"
+    },
+    {
+      "name": "Password"
+    },
+    {
+      "name": "Pod"
+    },
+    {
+      "name": "MirroringService"
+    },
+    {
+      "name": "Camera"
+    },
+    {
+      "name": "System"
+    },
+    {
+      "name": "Power"
+    },
+    {
+      "name": "RemoteControl"
+    },
+    {
+      "name": "Conference"
+    },
+    {
+      "name": "Ecosystem",
+      "description": "Read-only status and one-shot controls for third-party room control systems"
+    }
+  ],
+  "paths": {
+    "/api/v2/station/quickJoin": {
+      "get": {
+        "tags": [
+          "BeforeLogin"
+        ],
+        "description": "Obtain the Quick Join filename",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "string",
+                          "example": "AS301-abdd.aqj"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "AS301-abdd.aqj",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/general/logincode": {
+      "get": {
+        "tags": [
+          "BeforeLogin"
+        ],
+        "summary": "Retrieve the login code type",
+        "description": "It also wakes the station and shows the login code on the screen; use GET /api/v2/station/rvbc for polling.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "example": "frontend",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "codeType": {
+                              "type": "integer",
+                              "format": "int32",
+                              "example": 1,
+                              "description": "0(random), 1(no code), 2(fixed)",
+                              "enum": [
+                                0,
+                                1,
+                                2
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "codeType": 1
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/model": {
+      "get": {
+        "tags": [
+          "BeforeLogin"
+        ],
+        "description": "Webpage initialization requires preloaded parameters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "devName": {
+                              "type": "string",
+                              "example": "AS301-abdd",
+                              "description": "Device name"
+                            },
+                            "model": {
+                              "type": "string",
+                              "example": "AS-301"
+                            },
+                            "isAdminInit": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "true: the admin password is still the factory default and must be set first with PUT /api/v2/station/admin/password. false: the admin password has been set."
+                            },
+                            "isModerationInit": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "true: the moderator password is still the factory default and must be set first with PUT /api/v2/station/moderation/password. false: the moderator password has been set."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "devName": "AS301-abdd",
+                        "model": "AS-301",
+                        "isAdminInit": true,
+                        "isModerationInit": true
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/rvbc": {
+      "get": {
+        "tags": [
+          "BeforeLogin"
+        ],
+        "description": "Retrieve Remote View / Broadcast state and login code type. Used for frontend polling.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "allowRemoteView": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "Whether Remote View is enabled"
+                            },
+                            "allowBroadcast": {
+                              "type": "boolean",
+                              "example": false,
+                              "description": "Whether Broadcast mode is enabled"
+                            },
+                            "codeType": {
+                              "type": "integer",
+                              "format": "int32",
+                              "example": 1,
+                              "description": "Login code type: 0(random), 1(no code), 2(fixed)",
+                              "enum": [
+                                0,
+                                1,
+                                2
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "allowRemoteView": true,
+                        "allowBroadcast": false,
+                        "codeType": 1
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Enter the password to log in to the station settings page",
+        "description": "Each login creates a new token, and the previous token (including the one used by the web page) stops working.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response successful, determine business logic",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_login"
+                  },
+                  "failed_1003": {
+                    "$ref": "#/components/examples/failed_1003"
+                  },
+                  "failed_1005": {
+                    "$ref": "#/components/examples/failed_1005"
+                  },
+                  "failed_1100": {
+                    "summary": "Password format is invalid",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable:  &&(password) not matches the pattern: ^[A-Za-z0-9]{1,16}$",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/reboot": {
+      "post": {
+        "tags": [
+          "Global"
+        ],
+        "description": "Reboot station",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "setDhcp"
+                ],
+                "properties": {
+                  "setDhcp": {
+                    "type": "boolean",
+                    "example": false,
+                    "description": "true: switch Ethernet (LAN1) to DHCP before rebooting, used in Bridge mode. false: reboot only."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "failed_1003": {
+                    "$ref": "#/components/examples/failed_1003"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/upload": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Upload a wallpaper (type=BG) or a firmware file (type=OTA)",
+        "description": "For BG, name must start with the wallpaper slot number 2-7 (e.g. 3-cat.jpg); delete the existing wallpaper in that slot first. The image must be at most 3940 x 2500 pixels with a width/height ratio between 1.5 and 2.0 (e.g. 16:9, 16:10); otherwise errorCode 1200 is returned.\n\nFor OTA, name must be update.zip; data is false if the firmware is for a different model.\n\nTo import a configuration file, use PUT /api/v2/station/system/config instead.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "BG",
+                "OTA"
+              ]
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "File name (see the rules above)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/FileDescription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "failed_1200": {
+                    "summary": "The input file format is unavailable",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1200,
+                      "errorMsg": "The input file is unavailable: Not a image file",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1000": {
+                    "summary": "Wallpaper already exists",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: Wallpaper already exists",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/general": {
+      "get": {
+        "tags": [
+          "General"
+        ],
+        "description": "Retrieve common settings",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/GeneralInfo"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "allowRemoteView": false,
+                        "allowBroadcast": false,
+                        "displayMode": 0,
+                        "codeType": 1,
+                        "codeValue": "",
+                        "curLanguage": 0,
+                        "curWallpaper": 0,
+                        "devName": "AS301-abdd",
+                        "deviceNameShow": true,
+                        "ipShow": true,
+                        "miracastPinEnabled": false,
+                        "imageSliderEnabled": false,
+                        "imageSliderInterval": 30,
+                        "infoBarStyle": 0,
+                        "ucRoomSystemMode": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "General"
+        ],
+        "description": "Modify certain common settings",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneralInfo"
+              },
+              "examples": {
+                "Setting": {
+                  "summary": "Show the device name and use the dark information bar",
+                  "value": {
+                    "deviceNameShow": true,
+                    "infoBarStyle": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/general/wallpaper/list": {
+      "get": {
+        "tags": [
+          "General"
+        ],
+        "description": "Display wallpaper list",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "example": "0.png, 1.png"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": [
+                        "0.png",
+                        "1.png"
+                      ],
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/general/wallpaper/{id}": {
+      "delete": {
+        "tags": [
+          "General"
+        ],
+        "description": "Delete the specified wallpaper. The wallpaper in use cannot be deleted; switch to another one first.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParameter"
+          },
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "Empty_Wallpaper": {
+                    "summary": "Empty wallpaper",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: Empty wallpaper",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "In_Use_Wallpaper": {
+                    "summary": "Wallpaper in use",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: Unable to delete the wallpaper in use",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/resolution": {
+      "get": {
+        "tags": [
+          "HDMI & Type-C"
+        ],
+        "description": "Retrieve the HDMI / Type-C resolution and the audio output.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "hdmi": {
+                              "$ref": "#/components/schemas/ResolutionOutput"
+                            },
+                            "typeC": {
+                              "$ref": "#/components/schemas/ResolutionOutput"
+                            },
+                            "audioOutput": {
+                              "$ref": "#/components/schemas/AudioOutput"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "HDMI connected (Auto), Type-C not connected",
+                    "value": {
+                      "data": {
+                        "hdmi": {
+                          "resolution": "Auto",
+                          "output": "1920x1080"
+                        },
+                        "typeC": {
+                          "resolution": "Not connected",
+                          "output": "Not connected"
+                        },
+                        "audioOutput": 0
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success(Fixed)": {
+                    "summary": "Both outputs set to a fixed resolution",
+                    "value": {
+                      "data": {
+                        "hdmi": {
+                          "resolution": "3840x2160",
+                          "output": "3840x2160"
+                        },
+                        "typeC": {
+                          "resolution": "1920x1080",
+                          "output": "1920x1080"
+                        },
+                        "audioOutput": 2
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "HDMI & Type-C"
+        ],
+        "summary": "Change the HDMI / Type-C resolution and the audio output",
+        "description": "The station reboots to apply the changes.\n\nA port must be connected to change its resolution. Send the current value (from GET) for a port you do not change.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolutionInfo"
+              },
+              "examples": {
+                "Setting": {
+                  "summary": "Set HDMI to Auto, Type-C to 1920x1080, audio output to HDMI",
+                  "value": {
+                    "hdmi": {
+                      "resolution": "Auto"
+                    },
+                    "typeC": {
+                      "resolution": "1920x1080"
+                    },
+                    "audioOutput": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success, reboot required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": true
+                    }
+                  },
+                  "failed_1000": {
+                    "summary": "The output to change is not connected",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: HDMI: true, DP: DP not connect",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/resolution/hdmi/list": {
+      "get": {
+        "tags": [
+          "HDMI & Type-C"
+        ],
+        "summary": "Available HDMI resolutions for the connected display",
+        "description": "Returns 3840x2160, 1920x1200, 1920x1080 when no display is connected.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": [
+                        "Auto",
+                        "3840x2160",
+                        "1920x1200",
+                        "1920x1080"
+                      ],
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/resolution/dp/list": {
+      "get": {
+        "tags": [
+          "HDMI & Type-C"
+        ],
+        "summary": "Available Type-C resolutions for the connected display",
+        "description": "Returns 2560x1440, 1920x1200, 1920x1080 when no display is connected.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": [
+                        "Auto",
+                        "2560x1440",
+                        "1920x1200",
+                        "1920x1080"
+                      ],
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/time": {
+      "get": {
+        "tags": [
+          "DateTime"
+        ],
+        "description": "Retrieve time settings",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/TimeInfo"
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "GMT": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "example": 8,
+                                  "description": "UTC offset of the current time zone in hours, e.g. 8 or 5.5"
+                                },
+                                "curTimeMillis": {
+                                  "type": "integer",
+                                  "format": "int64",
+                                  "example": 1686562576700,
+                                  "description": "Current time of the station (Unix time in milliseconds)"
+                                },
+                                "inDaylightTime": {
+                                  "type": "boolean",
+                                  "example": false
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "GMT": 8,
+                        "curTimeMillis": 1686562576700,
+                        "dailyRebootTime": "02:00",
+                        "inDaylightTime": false,
+                        "isAutoTime": true,
+                        "isDailyReboot": true,
+                        "ntpServer": "ntp.nict.jp",
+                        "showTime24": false,
+                        "timeZone": "Asia/Taipei",
+                        "timeout": 5000
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "DateTime"
+        ],
+        "summary": "Modify certain time settings",
+        "description": "Changing ntpServer reboots the station automatically; send timeout together with ntpServer.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TimeInfo"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "curTimeMillis": {
+                        "type": "string",
+                        "example": "2023-04-12 17:28:37",
+                        "description": "Set the time manually (yyyy-MM-dd HH:mm:ss, in the station's time zone). Send it with isAutoTime: false."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/wifi": {
+      "get": {
+        "tags": [
+          "Wi-Fi"
+        ],
+        "description": "Retrieve Wi-Fi settings",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/WifiSettingInfo"
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "ssid": {
+                                  "type": "string",
+                                  "example": "AS301-abdd",
+                                  "pattern": "^[A-Za-z\\d\\-]{1,16}$"
+                                },
+                                "mac": {
+                                  "type": "string",
+                                  "example": "5c:f3:70:b1:df:71"
+                                },
+                                "isWifiDongle": {
+                                  "type": "boolean",
+                                  "example": false,
+                                  "description": "Whether a Wi-Fi dongle is connected."
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success_off": {
+                    "summary": "Success(Off)",
+                    "value": {
+                      "data": {
+                        "mac": "5c:f3:70:b1:df:71",
+                        "mode": 0,
+                        "isWifiDongle": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_ap": {
+                    "summary": "Success(Ap)",
+                    "value": {
+                      "data": {
+                        "mac": "5c:f3:70:b1:df:71",
+                        "mode": 1,
+                        "ssid": "AS301-abdd",
+                        "hideSSID": false,
+                        "security": 0,
+                        "band": 1,
+                        "channel": 44,
+                        "networkMode": 0,
+                        "gatekeeper": 0,
+                        "isWifiDongle": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_another_ap": {
+                    "summary": "Success(Another Ap)",
+                    "value": {
+                      "data": {
+                        "mac": "5c:f3:70:b1:df:71",
+                        "mode": 2,
+                        "isWifiDongle": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Wi-Fi"
+        ],
+        "summary": "Modify certain Wi-Fi settings",
+        "description": "mode is required.\n\nBridge (networkMode 1) works only with mode 1 (AP); switch to NAT before setting mode to 0 or 2.\n\nThe station reboots automatically when networkMode or channel changes; changing networkMode also switches Ethernet (LAN1) to DHCP.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WifiSettingInfo"
+              },
+              "examples": {
+                "wifi_ap": {
+                  "summary": "AP",
+                  "value": {
+                    "mode": 1,
+                    "hideSSID": false,
+                    "security": 0,
+                    "band": 1,
+                    "channel": 44,
+                    "networkMode": 0,
+                    "gatekeeper": 0
+                  }
+                },
+                "wifi_ap_wpa3": {
+                  "summary": "AP choose WPA3",
+                  "value": {
+                    "mode": 1,
+                    "hideSSID": false,
+                    "security": 2,
+                    "password": "123456789",
+                    "band": 1,
+                    "channel": 44,
+                    "networkMode": 0,
+                    "gatekeeper": 0
+                  }
+                },
+                "wifi_another_ap": {
+                  "summary": "Another AP",
+                  "value": {
+                    "mode": 2
+                  }
+                },
+                "wifi_off": {
+                  "summary": "Wifi OFF",
+                  "value": {
+                    "mode": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/wifi/list": {
+      "get": {
+        "tags": [
+          "Wi-Fi"
+        ],
+        "summary": "Scan and list nearby Wi-Fi networks",
+        "description": "Returns an empty list in AP mode.\n\nThe scan can take up to about 35 seconds; set the client timeout accordingly.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/WifiList"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "another_ap": {
+                    "summary": "Success(another AP mode)",
+                    "value": {
+                      "data": [
+                        {
+                          "level": 4,
+                          "security": "WPA2 PSK",
+                          "ssid": "Astrogate_2.4G",
+                          "status": "saved"
+                        },
+                        {
+                          "level": 3,
+                          "security": "WEP",
+                          "ssid": "A3002MU",
+                          "status": ""
+                        },
+                        {
+                          "level": 2,
+                          "security": "None",
+                          "ssid": "AS301-025d",
+                          "status": ""
+                        },
+                        {
+                          "level": 1,
+                          "security": "None",
+                          "ssid": "AS301-677b",
+                          "status": ""
+                        },
+                        {
+                          "level": 0,
+                          "security": "None",
+                          "ssid": "Venus",
+                          "status": ""
+                        }
+                      ],
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "not_another_ap": {
+                    "summary": "Success(Not another AP mode)",
+                    "value": {
+                      "data": [],
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/wifi/connection": {
+      "get": {
+        "tags": [
+          "Wi-Fi"
+        ],
+        "description": "Display Wi-Fi connection info, only visible in 'Other AP' mode with a connected Wi-Fi network",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "connected": {
+                                  "type": "boolean",
+                                  "example": true
+                                },
+                                "freq": {
+                                  "type": "integer",
+                                  "format": "int32",
+                                  "example": 5220
+                                },
+                                "isHide": {
+                                  "type": "boolean",
+                                  "example": false
+                                },
+                                "mac": {
+                                  "type": "string",
+                                  "example": "5c:f3:70:b1:df:71"
+                                },
+                                "speed": {
+                                  "type": "integer",
+                                  "format": "int32",
+                                  "example": 867
+                                },
+                                "level": {
+                                  "type": "integer",
+                                  "format": "int32",
+                                  "example": 4,
+                                  "description": "signal strength.",
+                                  "enum": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4
+                                  ]
+                                },
+                                "security": {
+                                  "type": "string",
+                                  "example": "WPA2 PSK",
+                                  "description": "wireless authentication method."
+                                },
+                                "ssid": {
+                                  "type": "string",
+                                  "example": "Astrogate_5G"
+                                },
+                                "ip": {
+                                  "type": "string",
+                                  "format": "ipv4",
+                                  "example": "192.168.125.153"
+                                },
+                                "mask": {
+                                  "type": "string",
+                                  "format": "ipv4",
+                                  "example": "255.255.255.0"
+                                },
+                                "gate": {
+                                  "type": "string",
+                                  "format": "ipv4",
+                                  "example": "192.168.125.1",
+                                  "description": "Default gateway"
+                                },
+                                "dns1": {
+                                  "type": "string",
+                                  "format": "ipv4",
+                                  "example": "168.95.1.1"
+                                },
+                                "dns2": {
+                                  "type": "string",
+                                  "format": "ipv4",
+                                  "example": "8.8.8.8"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "no_connected": {
+                    "summary": "Success(no connected)",
+                    "value": {
+                      "data": {
+                        "connected": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "connected": {
+                    "summary": "Success(connected)",
+                    "value": {
+                      "data": {
+                        "connected": true,
+                        "ip": "192.168.125.153",
+                        "mask": "255.255.255.0",
+                        "gate": "192.168.125.1",
+                        "dns1": "168.95.1.1",
+                        "dns2": "8.8.8.8",
+                        "freq": 5220,
+                        "isHide": false,
+                        "mac": "5c:f3:70:b1:df:71",
+                        "speed": 867,
+                        "level": 4,
+                        "security": "WPA2 PSK",
+                        "ssid": "Astrogate_5G"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Wi-Fi"
+        ],
+        "description": "Manually add Wi-Fi connection info, only visible in 'Other AP' mode",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/WifiConnectionInfo"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "security": {
+                        "type": "string",
+                        "example": "WPA2-PSK",
+                        "enum": [
+                          "None",
+                          "WPA2-PSK",
+                          "WPA3-SAE",
+                          "802.1xEAP"
+                        ],
+                        "description": "Security of the network to add"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Wi-Fi"
+        ],
+        "summary": "Connect to an SSID from the Wi-Fi list, only in 'Other AP' mode",
+        "description": "ssid is required and must appear in GET /api/v2/station/wifi/list; otherwise the request does not return.\n\nEncode the password before sending: replace \\ with \\\\\\\\, then URL-encode it twice.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WifiConnectionInfo"
+              },
+              "examples": {
+                "success_0": {
+                  "summary": "Connect Astrogate_5G",
+                  "value": {
+                    "ssid": "Astrogate_5G",
+                    "password": "83566024",
+                    "isStaticIp": false,
+                    "ip": "",
+                    "mask": "",
+                    "gateway": "",
+                    "dns1": "",
+                    "dns2": "",
+                    "reconnect": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Wi-Fi"
+        ],
+        "summary": "Forget a saved Wi-Fi network by SSID",
+        "description": "If the station is connected to it, it disconnects.\n\ndata is false when Wi-Fi is off or the SSID is not found.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ssid",
+            "example": "Astrogate_5G",
+            "in": "query",
+            "required": true,
+            "description": "SSID of the saved network (exact match)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "Not_Found": {
+                    "summary": "Success(SSID not found or Wi-Fi off)",
+                    "value": {
+                      "data": false,
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/ethernet": {
+      "get": {
+        "tags": [
+          "Ethernet"
+        ],
+        "summary": "Retrieve the settings of each Ethernet port: eth0 (LAN1) and eth1 (LAN2)",
+        "description": "Address fields are empty strings when the port is not connected and has no stored static IP.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "eth0": {
+                              "$ref": "#/components/schemas/EthernetStatus"
+                            },
+                            "eth1": {
+                              "$ref": "#/components/schemas/EthernetStatus"
+                            },
+                            "mac": {
+                              "type": "string",
+                              "example": "5c:f3:70:b1:df:71",
+                              "description": "MAC address of LAN1 (eth0)"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "LAN1 connected by DHCP, LAN2 not connected",
+                    "value": {
+                      "data": {
+                        "eth0": {
+                          "connected": true,
+                          "enableDHCP": true,
+                          "ip": "192.168.125.153",
+                          "mask": "255.255.255.0",
+                          "gateway": "192.168.125.1",
+                          "dns1": "168.95.1.1",
+                          "dns2": "8.8.8.8"
+                        },
+                        "eth1": {
+                          "connected": false,
+                          "enableDHCP": true,
+                          "ip": "",
+                          "mask": "",
+                          "gateway": "",
+                          "dns1": "",
+                          "dns2": ""
+                        },
+                        "mac": "5c:f3:70:b1:df:71"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Ethernet"
+        ],
+        "summary": "Change the Ethernet settings, keyed by port: eth0 (LAN1), eth1 (LAN2)",
+        "description": "For a static IP, all address fields are required; set dns2 to 0.0.0.0 if unused.\n\nA static IP cannot be set while the Wi-Fi networkMode is Bridge (errorCode 1000); switch to NAT first.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EthernetSetting"
+              },
+              "examples": {
+                "Setting_DHCP": {
+                  "summary": "Set LAN1 to DHCP",
+                  "value": {
+                    "eth0": {
+                      "enableDHCP": true
+                    }
+                  }
+                },
+                "Setting_static": {
+                  "summary": "Set LAN1 to DHCP and LAN2 to a static IP",
+                  "value": {
+                    "eth0": {
+                      "enableDHCP": true
+                    },
+                    "eth1": {
+                      "enableDHCP": false,
+                      "ip": "192.168.10.20",
+                      "mask": "255.255.255.0",
+                      "gateway": "192.168.10.1",
+                      "dns1": "168.95.1.1",
+                      "dns2": "0.0.0.0"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/firmware": {
+      "get": {
+        "tags": [
+          "Update"
+        ],
+        "summary": "Retrieve firmware version",
+        "description": "With hasNew=true, data is an object with current and new.\n\nWith hasNew=false (default), data is only the current version string, e.g. 1.0.0.84(20261012).\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          },
+          {
+            "name": "hasNew",
+            "in": "query",
+            "description": "When true, check the OTA server for a newer version",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "description": "With hasNew=true. With hasNew=false (default), data is only the current version string, e.g. 1.0.0.84(20261012).",
+                          "properties": {
+                            "current": {
+                              "type": "string",
+                              "description": "Current version",
+                              "example": "1.0.0.84(20261012)"
+                            },
+                            "new": {
+                              "type": "string",
+                              "description": "Latest version on the OTA server; none if already up to date; unknown if the check failed",
+                              "example": "1.0.0.85(20261019)"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success_getFW": {
+                    "summary": "Success(Get FW version)",
+                    "value": {
+                      "data": "1.0.0.84(20261012)",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_hasNew_none": {
+                    "summary": "Success(No new version)",
+                    "value": {
+                      "data": {
+                        "current": "1.0.0.84(20261012)",
+                        "new": "none"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_hasNew_true": {
+                    "summary": "Success(Has new version)",
+                    "value": {
+                      "data": {
+                        "current": "1.0.0.84(20261012)",
+                        "new": "1.0.0.85(20261019)"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_hasNew_unknown": {
+                    "summary": "Success(unknown error)",
+                    "value": {
+                      "data": {
+                        "current": "1.0.0.84(20261012)",
+                        "new": "unknown"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Update"
+        ],
+        "summary": "Install the firmware file and reboot into recovery to update",
+        "description": "With isManual=true, upload update.zip with POST /api/v2/station/upload (type=OTA) first; with isManual=false, download it with PUT /api/v2/station/firmware/download/start first.\n\nReturns false if the file is missing or invalid.\n\nOn success the station reboots automatically, although rebootRequired is false.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          },
+          {
+            "name": "isManual",
+            "in": "query",
+            "required": true,
+            "description": "true: install the uploaded file; false: install the file downloaded from the OTA server",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "Success_local_no_file": {
+                    "summary": "Success(File missing or invalid)",
+                    "value": {
+                      "data": false,
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/firmware/download/start": {
+      "put": {
+        "tags": [
+          "Update"
+        ],
+        "summary": "Start downloading the latest firmware from the OTA server",
+        "description": "Call it again every few seconds to get the progress until status is 2, then install it with POST /api/v2/station/firmware (isManual=false).\n\nIf a download fails, the next call starts it again.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "process": {
+                              "type": "integer",
+                              "description": "Progress percentage",
+                              "minimum": 0,
+                              "maximum": 100
+                            },
+                            "status": {
+                              "type": "integer",
+                              "description": "-1: no newer firmware available, 1: downloading, 2: download complete",
+                              "example": 1,
+                              "enum": [
+                                -1,
+                                1,
+                                2
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success_down_fail": {
+                    "summary": "Success(No newer firmware)",
+                    "value": {
+                      "data": {
+                        "process": 0,
+                        "status": -1
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_down_doing": {
+                    "summary": "Success(Downloading)",
+                    "value": {
+                      "data": {
+                        "process": 12,
+                        "status": 1
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_down_finish": {
+                    "summary": "Success(Download Finished)",
+                    "value": {
+                      "data": {
+                        "process": 100,
+                        "status": 2
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/firmware/download/stop": {
+      "put": {
+        "tags": [
+          "Update"
+        ],
+        "description": "Stop remote OTA download",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "failed_1000_not_downloading": {
+                    "summary": "No download in progress",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: Nothing happened",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/ota/check": {
+      "get": {
+        "tags": [
+          "Update"
+        ],
+        "summary": "Check the downloaded firmware",
+        "description": "Check whether the firmware found by GET /api/v2/station/firmware has been fully downloaded and verified.\n\nReturns false after the station restarts, or for a file uploaded manually.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "Success_local_no_file": {
+                    "summary": "Success(Not downloaded or not verified)",
+                    "value": {
+                      "data": false,
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/admin/password": {
+      "put": {
+        "tags": [
+          "Password"
+        ],
+        "description": "Change admin password",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordInfo"
+              },
+              "examples": {
+                "change_password": {
+                  "summary": "Change password",
+                  "value": {
+                    "old": "admin",
+                    "new": "admin233",
+                    "confirm": "admin233"
+                  }
+                },
+                "init_password": {
+                  "summary": "Change default password",
+                  "description": "On first entry to the station screen, a password reset is required. This operation does not require X-API-KEY or username and cannot be tested via Swagger",
+                  "value": {
+                    "new": "admin233"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "failed_1100_new_confirm_not_match": {
+                    "summary": "New & Confirm Password do not match",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: passwords do not match",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1100_current_error": {
+                    "summary": "Current password is wrong",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: current password is wrong",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1100_pattern": {
+                    "summary": "Not matches the pattern",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: not matches the pattern: ^[A-Za-z0-9]{1,16}$",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1100_the_same": {
+                    "summary": "Current password & new password are the same",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: current password & new password are the same",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/moderation/password": {
+      "put": {
+        "tags": [
+          "Password"
+        ],
+        "description": "Change moderation password",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordInfo"
+              },
+              "examples": {
+                "change_password": {
+                  "summary": "Change password",
+                  "value": {
+                    "old": "moderator",
+                    "new": "moderator233",
+                    "confirm": "moderator233"
+                  }
+                },
+                "init_password": {
+                  "summary": "Change default password",
+                  "description": "On first entry to the station screen, a password reset is required. This operation does not require X-API-KEY or username, and cannot be tested via Swagger",
+                  "value": {
+                    "new": "moderator233"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "failed_1100_new_confirm_not_match": {
+                    "summary": "New & Confirm Password do not match",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: passwords do not match",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1100_current_error": {
+                    "summary": "Current password is wrong",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: current password is wrong",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1100_pattern": {
+                    "summary": "Not matches the pattern",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: not matches the pattern: ^[A-Za-z0-9]{1,16}$",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1100_the_same": {
+                    "summary": "Current password & new password are the same",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1100,
+                      "errorMsg": "The input value is unavailable: current password & new password are the same",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/pod/pairing": {
+      "get": {
+        "tags": [
+          "Pod"
+        ],
+        "description": "Retrieve Pod pairing settings",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PodInfo"
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "ip": {
+                                  "type": "string",
+                                  "format": "ipv4",
+                                  "example": "192.168.125.223",
+                                  "description": "Pod pairing target IP. When mode=0 and station Wi-Fi is AP mode (NAT), fixed to 192.168.120.11; otherwise (STA / Wi-Fi off / bridge mode) follows station's current IP"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success_0": {
+                    "summary": "Success > this station (in AP mode, ip is fixed to 192.168.120.11)",
+                    "value": {
+                      "data": {
+                        "mode": 0,
+                        "ip": "192.168.120.11",
+                        "ssid": "AS301-abdd",
+                        "security": 0,
+                        "password": "",
+                        "channel": 0,
+                        "autoProjection": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_1": {
+                    "summary": "Success > other, not WPA2",
+                    "value": {
+                      "data": {
+                        "mode": 1,
+                        "ip": "192.168.125.223",
+                        "ssid": "Astrogate_Unknown",
+                        "security": 0,
+                        "password": "",
+                        "channel": 0,
+                        "autoProjection": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_2": {
+                    "summary": "Success > other and WPA2",
+                    "value": {
+                      "data": {
+                        "mode": 1,
+                        "ip": "192.168.125.223",
+                        "ssid": "Astrogate_Unknown",
+                        "security": 1,
+                        "password": "qwer!!test",
+                        "channel": 0,
+                        "autoProjection": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_3": {
+                    "summary": "Success > other and WPA3",
+                    "value": {
+                      "data": {
+                        "mode": 1,
+                        "ip": "192.168.125.223",
+                        "ssid": "Astrogate_Unknown",
+                        "security": 2,
+                        "password": "qwer!!test",
+                        "channel": 44,
+                        "autoProjection": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_4": {
+                    "summary": "Success > other and WPA3/WPA2 mixed mode",
+                    "value": {
+                      "data": {
+                        "mode": 1,
+                        "ip": "192.168.125.223",
+                        "ssid": "Astrogate_Unknown",
+                        "security": 3,
+                        "password": "qwer!!test",
+                        "channel": 44,
+                        "autoProjection": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Pod"
+        ],
+        "summary": "Set the Pod pairing status",
+        "description": "mode is required. With mode 1, send ssid and security, plus password unless security is 0.\n\nmode 0 clears the custom ssid and password.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PodInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/service": {
+      "get": {
+        "tags": [
+          "MirroringService"
+        ],
+        "description": "Retrieve the activation status of all projection features",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/ServiceInfo"
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "isWifiDongle": {
+                                  "type": "boolean",
+                                  "example": false,
+                                  "description": "Whether a Wi-Fi dongle is connected. When true, allowMiracast cannot be changed."
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "allowMiracast": false,
+                        "allowGoogleCast": true,
+                        "allowAirPlay": true,
+                        "isWifiDongle": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "MirroringService"
+        ],
+        "summary": "Set the activation status of projection features",
+        "description": "The station reboots automatically after every call.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/camera": {
+      "get": {
+        "tags": [
+          "Camera"
+        ],
+        "summary": "Retrieve the latest UVC camera state cached from the receiver",
+        "description": "ready=false means CAMERA_STATE has not been received yet and state only contains layout/position/swap read from persist properties.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "ready": {
+                              "type": "boolean",
+                              "description": "false = CAMERA_STATE not received yet"
+                            },
+                            "state": {
+                              "$ref": "#/components/schemas/CameraState"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "ready": true,
+                        "state": {
+                          "layout": 1,
+                          "position": 3,
+                          "swap": false,
+                          "on": true,
+                          "fullScreen": false,
+                          "resolutionMode": 1,
+                          "cameraCount": 2,
+                          "camera1": "C922 Pro Stream Webcam",
+                          "camera2": "i3 Camera F1201",
+                          "bandwidthWarning": false,
+                          "canLayout": true,
+                          "canSwap": true,
+                          "canFullScreen": false
+                        }
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Camera"
+        ],
+        "summary": "Forward layout/swap commands to the receiver as broadcasts",
+        "description": "Fire-and-forget: poll GET to confirm the change took effect.\n\nAt least one of layout / swap is required.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CameraSetting"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": true,
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/system/reset": {
+      "post": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Reset to factory settings",
+        "description": "The settings will be reset to factory values, but the firmware version will not be reset.\n\nThe station reboots automatically.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/system/log/switch": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "description": "Retrieve whether debug logging is on",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "switch": {
+                              "type": "boolean",
+                              "example": false,
+                              "description": "true: on, false: off"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "switch": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "System"
+        ],
+        "description": "Turn debug logging on or off",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "switch"
+                ],
+                "properties": {
+                  "switch": {
+                    "type": "boolean",
+                    "example": false,
+                    "description": "true: on, false: off"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/system/log": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "description": "Retrieve the progress of preparing the system log file",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "statusLog": {
+                              "type": "integer",
+                              "format": "int32",
+                              "example": 0,
+                              "description": "-1(Failed), 0(Not started), 1(Preparing), 2(Ready to download from filePath)",
+                              "enum": [
+                                -1,
+                                0,
+                                1,
+                                2
+                              ]
+                            },
+                            "filePath": {
+                              "type": "string",
+                              "example": "AS301-abdd-261110115611.log",
+                              "description": "Log file name. Download it from https://<station IP>/userfile/OTA/<filePath> only when statusLog is 2."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success_not_download": {
+                    "summary": "Success(Not started)",
+                    "value": {
+                      "data": {
+                        "statusLog": 0
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_downloading": {
+                    "summary": "Success(Preparing)",
+                    "value": {
+                      "data": {
+                        "statusLog": 1,
+                        "filePath": "AS301-abdd-261110115611.log"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_download_finish": {
+                    "summary": "Success(Ready to download)",
+                    "value": {
+                      "data": {
+                        "statusLog": 2,
+                        "filePath": "AS301-abdd-261110115611.log"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Start preparing the system log file",
+        "description": "The file is prepared in the background; poll GET /api/v2/station/system/log until statusLog is 2.\n\nReturns false if a preparation is already in progress.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/system/config": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "description": "Export the current configuration to a file and return its file name",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "string",
+                          "example": "AS301-abdd_Profile.config",
+                          "description": "Download the file from https://<station IP>/userfile/OTA/<data>"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "AS301-abdd_Profile.config",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Import a configuration file",
+        "description": "The station reboots automatically about 5 seconds later.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fileName"
+                ],
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The configuration file exported by GET /api/v2/station/system/config (.config)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": true
+                    }
+                  },
+                  "failed_1200": {
+                    "summary": "Not a .config file",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1200,
+                      "errorMsg": "The input file is unavailable: not an allowed extension: [config]",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/power/setting": {
+      "get": {
+        "tags": [
+          "Power"
+        ],
+        "description": "Retrieve power-saving settings",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PowerInfo"
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "ucRoomSystemMode": {
+                                  "type": "boolean",
+                                  "example": false,
+                                  "description": "UC Room System Mode. When enabled, auto sleep is disabled and controlled by astros_server. Change it with PATCH /api/v2/station/general."
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success_sleep": {
+                    "summary": "Success(Sleep mode)",
+                    "value": {
+                      "data": {
+                        "mode": 0,
+                        "time": 5,
+                        "ucRoomSystemMode": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_sleep_uc_enabled": {
+                    "summary": "Success(Sleep mode, UC Room System Mode enabled)",
+                    "value": {
+                      "data": {
+                        "mode": 0,
+                        "time": -1,
+                        "ucRoomSystemMode": true
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Success_suspend": {
+                    "summary": "Success(Suspend mode)",
+                    "value": {
+                      "data": {
+                        "mode": 1,
+                        "ucRoomSystemMode": false
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Power"
+        ],
+        "summary": "Modify the power-saving settings",
+        "description": "mode is required; time is required when mode is 0 and ignored when mode is 1.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PowerInfo"
+              },
+              "examples": {
+                "sleep_mode": {
+                  "summary": "Sleep mode (time -1 = no timer, 1 = 10 seconds, others in minutes)",
+                  "value": {
+                    "mode": 0,
+                    "time": -1
+                  }
+                },
+                "suspend_mode": {
+                  "summary": "Suspend mode",
+                  "value": {
+                    "mode": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "$ref": "#/components/examples/success_0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/remote/amsName": {
+      "get": {
+        "tags": [
+          "RemoteControl"
+        ],
+        "description": "Retrieve ASTROS Manager Server",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "string",
+                          "example": "AstrogateMGM",
+                          "description": "AMS service name or IP. Empty if not set."
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": "AstrogateMGM",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "RemoteControl"
+        ],
+        "description": "Change ASTROS Manager Server",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amsName"
+                ],
+                "properties": {
+                  "amsName": {
+                    "type": "string",
+                    "example": "AstrogateMGM233",
+                    "description": "AMS service name, or the IP address of the AMS server. An empty string stops registering to AMS."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "success_0": {
+                    "$ref": "#/components/examples/success_0"
+                  },
+                  "failed_1003": {
+                    "$ref": "#/components/examples/failed_1003"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/remote/apikey": {
+      "get": {
+        "tags": [
+          "RemoteControl"
+        ],
+        "description": "Retrieve API token",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ApiKeyInfo"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "token": "IAgSdBJ0IpjXdCgJ"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "RemoteControl"
+        ],
+        "description": "Update API token",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ApiKeyInfo"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "token": "nGv9A3NhVjlU6xZQ"
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/conference/appBYOM": {
+      "get": {
+        "tags": [
+          "Conference"
+        ],
+        "description": "Retrieve appBYOM activation status",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "expiredDate": {
+                              "type": "string",
+                              "description": "Permanent keys will always start with 2099",
+                              "example": "2024-04-26"
+                            },
+                            "key": {
+                              "type": "string",
+                              "description": "Default is an empty string; if the permanent key is activated successfully, a value will appear",
+                              "example": "l3BzuIRHpjHUoeCr50dPrs37l07khmfcDSMWdYINQoBBXhsghqIggP17vujNZG8stQA="
+                            },
+                            "status": {
+                              "type": "integer",
+                              "description": "0 (Not activated), 1 (Activated), 2 (Expired)",
+                              "example": 1
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "NotEnabled": {
+                    "summary": "Not activated",
+                    "value": {
+                      "data": {
+                        "expiredDate": "",
+                        "key": "",
+                        "status": 0
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Enabled": {
+                    "summary": "Trial version activated",
+                    "value": {
+                      "data": {
+                        "expiredDate": "2029-04-26",
+                        "key": "",
+                        "status": 1
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "OfficialEnabled": {
+                    "summary": "Full version activated",
+                    "value": {
+                      "data": {
+                        "expiredDate": "2099-12-30",
+                        "key": "l3BzuIRHpjHUoeCr50dPrs37l07khmfcDSMWdYINQoBBXhsghqIggP17vujNZG8stQA=",
+                        "status": 1
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "Expired": {
+                    "summary": "Expired (only the trial version can expire)",
+                    "value": {
+                      "data": {
+                        "expiredDate": "2024-04-10",
+                        "key": "",
+                        "status": 2
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Conference"
+        ],
+        "description": "Activate appBYOM Key. Call POST /api/v2/station/reboot to apply it.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "key",
+                  "type"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "description": "The key issued by Astrogate. Only letters, digits, =, / and + are allowed; other characters return errorCode 1100.",
+                    "example": "l3BzuIRHpjHUuOmwlgN5ylzKSWrr5xRAZhM2rL0PjUwsCK2CpCrJu3UK/HqNv6KIDLE="
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "License type. Must be appvc.",
+                    "enum": [
+                      "appvc"
+                    ],
+                    "example": "appvc"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Activation successful",
+                    "value": {
+                      "data": "",
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": true
+                    }
+                  },
+                  "KeyNotFound": {
+                    "summary": "Key not found in DB",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: key is not found",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "NotConsistent": {
+                    "summary": "Vendor or model mismatch with data",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: vendor or model is not consistent",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "AlreadyRegistered": {
+                    "summary": "Key already activated on another station",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: Already registered in another machine",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "AlreadyOfficialVersion": {
+                    "summary": "Already a permanent version",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: Already the official version",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/status": {
+      "get": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "summary": "Station state and network info",
+        "description": "state: ready (no client connected) / busy (any client connected, including remote view and camera) / updating (firmware update in progress).\n\nnetwork: IP and MAC of LAN1, LAN2 and Wi-Fi.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/StationStatus"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "state": "ready",
+                        "name": "Meeting Room A",
+                        "model": "AS-301",
+                        "fwVersion": "1.0.0.84",
+                        "network": {
+                          "lan1": {
+                            "ip": "192.168.1.10",
+                            "mac": "da:b5:28:98:ab:dd"
+                          },
+                          "lan2": {
+                            "ip": "",
+                            "mac": "de:b5:28:98:ab:dd"
+                          },
+                          "wifi": {
+                            "ip": "192.168.120.11",
+                            "mac": "bc:df:e1:50:35:e5"
+                          }
+                        }
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/session": {
+      "get": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "summary": "Retrieve the current sharing session",
+        "description": "Returns whether anyone is presenting, the sharing methods in use, and presenter / connected / viewer counts.\n\nsources lists the sharing methods currently presenting, in stream order. Possible values: App, Pod, Ipad Pro, Browser Sharing, AirPlay, GoogleCast, Miracast, Wired Sharing, Unknown.\n\nNo user names are returned.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SessionSummary"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "sharing": true,
+                        "presenterCount": 2,
+                        "connectedCount": 3,
+                        "viewerCount": 1,
+                        "sources": [
+                          "App",
+                          "AirPlay"
+                        ]
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/session/stop": {
+      "post": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "summary": "Stop all sharing",
+        "description": "ASTROS App and Pod stay connected; Wired Sharing, Browser Sharing, AirPlay, GoogleCast and Miracast are disconnected.\n\nRemote view is closed (web) or paused (app).\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "stoppedCount": {
+                              "type": "integer",
+                              "description": "Number of presenters before the stop command"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "stoppedCount": 2
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1000_updating": {
+                    "$ref": "#/components/examples/failed_1000_updating"
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/session/disconnect": {
+      "post": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "description": "Disconnect all clients, including remote viewers. Sharing ends as well.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "disconnectedCount": {
+                              "type": "integer",
+                              "description": "Number of connected clients before the disconnect command"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "disconnectedCount": 3
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1000_updating": {
+                    "$ref": "#/components/examples/failed_1000_updating"
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/standby": {
+      "post": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "summary": "Put the station to sleep",
+        "description": "Same as a short press of the power button.\n\nRejected (errorCode 1000) in UC Room mode or when the station is busy (any client connected). Returns true if already asleep.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": true,
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1000_updating": {
+                    "$ref": "#/components/examples/failed_1000_updating"
+                  },
+                  "failed_1000_uc_room": {
+                    "summary": "UC Room mode",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: standby not allowed in UC Room mode",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1000_in_use": {
+                    "summary": "Client connected",
+                    "value": {
+                      "data": "",
+                      "errorCode": 1000,
+                      "errorMsg": "Fail: station is in use",
+                      "isSuccess": false,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/wakeup": {
+      "post": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "description": "Wake the station. Returns true if already awake.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneralResponse"
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": true,
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1000_updating": {
+                    "$ref": "#/components/examples/failed_1000_updating"
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/peripherals": {
+      "get": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "summary": "List the connected USB camera, speaker and microphone",
+        "description": "AS-301 only.\n\nA device with both functions (e.g. a speakerphone, or a camera with a microphone) is listed in each group.\n\nOnly one USB audio device is recognized at a time.\n\nIn wired BYOM mode, peripherals are passed through to the laptop and not listed.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Peripherals"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "camera": {
+                          "count": 1,
+                          "devices": [
+                            "C922 Pro Stream Webcam"
+                          ],
+                          "bandwidthWarning": false
+                        },
+                        "speaker": {
+                          "count": 1,
+                          "devices": [
+                            "Jabra Speak2 40 MS"
+                          ]
+                        },
+                        "microphone": {
+                          "count": 1,
+                          "devices": [
+                            "Jabra Speak2 40 MS"
+                          ]
+                        }
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/station/video/output/status": {
+      "get": {
+        "tags": [
+          "Ecosystem"
+        ],
+        "summary": "Video output state",
+        "description": "connected: a display is detected; active: the port is outputting; resolution: current output mode; dualDisplay: extended (true) or mirrored (false).\n\nThe external display's power state cannot be detected.\n",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/GeneralResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/VideoOutputStatus"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "Success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "dualDisplay": false,
+                        "hdmi": {
+                          "connected": true,
+                          "active": true,
+                          "resolution": "3840x2160"
+                        },
+                        "typeC": {
+                          "connected": false,
+                          "active": false,
+                          "resolution": ""
+                        }
+                      },
+                      "errorCode": 0,
+                      "isSuccess": true,
+                      "model": "AS-301",
+                      "rebootRequired": false
+                    }
+                  },
+                  "failed_1001": {
+                    "$ref": "#/components/examples/failed_1001"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserInfo": {
+        "type": "object",
+        "required": [
+          "account",
+          "password"
+        ],
+        "properties": {
+          "account": {
+            "type": "string",
+            "enum": [
+              "admin"
+            ],
+            "example": "admin",
+            "description": "Must be admin"
+          },
+          "password": {
+            "type": "string",
+            "example": "admin",
+            "description": "Admin password. It is admin until it is set for the first time (isAdminInit in GET /api/v2/station/model). 1-16 letters or digits; other formats return 1100."
+          }
+        }
+      },
+      "FileDescription": {
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "GeneralInfo": {
+        "type": "object",
+        "properties": {
+          "devName": {
+            "type": "string",
+            "example": "AS301-abdd",
+            "pattern": "^[A-Za-z0-9-]{1,16}$",
+            "description": "Changing this will disconnect all networks; the station reboots automatically."
+          },
+          "deviceNameShow": {
+            "type": "boolean",
+            "example": true
+          },
+          "codeType": {
+            "type": "integer",
+            "example": 1,
+            "description": "0(random), 1(no code), 2(fixed)",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "codeValue": {
+            "type": "string",
+            "example": "",
+            "description": "4 digits. Required when codeType is 2(fixed); empty otherwise."
+          },
+          "ipShow": {
+            "type": "boolean",
+            "example": true
+          },
+          "curWallpaper": {
+            "type": "integer",
+            "example": 0,
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          "allowRemoteView": {
+            "type": "boolean",
+            "example": false
+          },
+          "allowBroadcast": {
+            "type": "boolean",
+            "example": false,
+            "description": "Enabling it sets codeType to 1(no code), turns off allowRemoteView and switches displayMode to 0(Duplicate). While it is on, codeType, codeValue and allowRemoteView are ignored. Changing it reboots the station automatically."
+          },
+          "displayMode": {
+            "type": "integer",
+            "example": 0,
+            "description": "0(Duplicate), 1(Extend). Changing it reboots the station automatically.",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "curLanguage": {
+            "type": "integer",
+            "example": 0,
+            "description": "(0)English, (1)Traditional Chinese, (2)Simplified Chinese, (3)Japanese, (4)Korean, (5)Vietnamese, (6)Indonesian, (7)Spanish, (8)Dutch",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8
+            ]
+          },
+          "miracastPinEnabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "imageSliderEnabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "imageSliderInterval": {
+            "type": "integer",
+            "example": 30,
+            "description": "Slideshow interval in seconds: 10, 30 (default), 45"
+          },
+          "infoBarStyle": {
+            "type": "integer",
+            "example": 0,
+            "description": "Standby screen information bar style: 0(light), 1(dark)",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "ucRoomSystemMode": {
+            "type": "boolean",
+            "example": false,
+            "description": "UC Room System Mode. When enabled, auto sleep on Power Saving page is disabled"
+          }
+        }
+      },
+      "ResolutionInfo": {
+        "type": "object",
+        "required": [
+          "hdmi",
+          "typeC"
+        ],
+        "properties": {
+          "hdmi": {
+            "type": "object",
+            "required": [
+              "resolution"
+            ],
+            "properties": {
+              "resolution": {
+                "type": "string",
+                "example": "Auto",
+                "description": "One of Auto, 3840x2160, 1920x1200, 1920x1080. The connected display must also support the value."
+              }
+            }
+          },
+          "typeC": {
+            "type": "object",
+            "required": [
+              "resolution"
+            ],
+            "properties": {
+              "resolution": {
+                "type": "string",
+                "example": "1920x1080",
+                "description": "One of Auto, 2560x1440, 1920x1200, 1920x1080. The connected display must also support the value."
+              }
+            }
+          },
+          "audioOutput": {
+            "$ref": "#/components/schemas/AudioOutput"
+          }
+        }
+      },
+      "ResolutionOutput": {
+        "type": "object",
+        "properties": {
+          "resolution": {
+            "type": "string",
+            "example": "Auto",
+            "description": "Resolution setting, or \"Not connected\" when no display is connected."
+          },
+          "output": {
+            "type": "string",
+            "example": "1920x1080",
+            "description": "The resolution in use when resolution is Auto; otherwise the same as resolution."
+          }
+        }
+      },
+      "AudioOutput": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "example": 0,
+        "description": "Audio output: 0(Auto), 1(USB), 2(HDMI), 3(Type-C). Omitted in a request means 0."
+      },
+      "TimeInfo": {
+        "type": "object",
+        "properties": {
+          "isAutoTime": {
+            "type": "boolean",
+            "example": true,
+            "description": "Automatically set the time"
+          },
+          "showTime24": {
+            "type": "boolean",
+            "example": false,
+            "description": "Display in 24-hour format"
+          },
+          "ntpServer": {
+            "type": "string",
+            "example": "ntp.nict.jp",
+            "description": "Network Time Protocol"
+          },
+          "timeZone": {
+            "type": "string",
+            "example": "Asia/Taipei",
+            "description": "IANA time zone ID. GET returns spaces instead of underscores (e.g. America/New York); PATCH accepts both."
+          },
+          "timeout": {
+            "type": "integer",
+            "example": 5000,
+            "description": "NTP connection timeout in milliseconds. Required when ntpServer is sent."
+          },
+          "isDailyReboot": {
+            "type": "boolean",
+            "example": true,
+            "description": "Reboot the station every day at dailyRebootTime. Send it together with dailyRebootTime; otherwise the time is reset to 02:00."
+          },
+          "dailyRebootTime": {
+            "type": "string",
+            "example": "02:00",
+            "description": "Daily reboot time in 24-hour HH:mm. An invalid value is replaced by 02:00."
+          }
+        }
+      },
+      "WifiSettingInfo": {
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "type": "integer",
+            "example": 1,
+            "description": "0(OFF), 1(AP), 2(STA)",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "hideSSID": {
+            "type": "boolean",
+            "example": false,
+            "description": "Hide ssid from Wi-Fi list."
+          },
+          "security": {
+            "type": "integer",
+            "example": 0,
+            "description": "wireless authentication method: 0(none), 2(WPA3-SAE), 3(WPA3/WPA2 mixed mode)",
+            "enum": [
+              0,
+              2,
+              3
+            ]
+          },
+          "password": {
+            "type": "string",
+            "example": "123456789",
+            "pattern": "^[A-Za-z0-9]{8,16}$",
+            "description": "Required when security is not 0. If omitted, the current password is kept."
+          },
+          "band": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1,
+            "description": "802.11 frequency band: 0(2.4GHz), 1(5GHz)",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "channel": {
+            "type": "integer",
+            "format": "int32",
+            "example": 44,
+            "description": "5GHz channel: 36, 40, 44, 48, 149, 153, 157, 161. Used only when band is 1; with 2.4GHz the channel is selected automatically. Omit it when using 2.4GHz.",
+            "enum": [
+              36,
+              40,
+              44,
+              48,
+              149,
+              153,
+              157,
+              161
+            ]
+          },
+          "networkMode": {
+            "type": "integer",
+            "format": "int32",
+            "example": 0,
+            "description": "The networking mode: 0(NAT), 1(Bridge)",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "gatekeeper": {
+            "type": "integer",
+            "format": "int32",
+            "example": 0,
+            "description": "The rule of gatekeeper: 0(Allow All), 1(Internet Only), 2(Block All)",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        }
+      },
+      "WifiList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/WifiListInfo"
+        }
+      },
+      "WifiListInfo": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "format": "int32",
+            "example": 4,
+            "description": "signal strength.",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "security": {
+            "type": "string",
+            "example": "WPA2 PSK",
+            "description": "wireless authentication method."
+          },
+          "ssid": {
+            "type": "string",
+            "example": "Astrogate_5G"
+          },
+          "status": {
+            "type": "string",
+            "example": "connected",
+            "description": "connected: currently connected; saved: saved but not connected; empty string: not saved"
+          }
+        }
+      },
+      "WifiConnectionInfo": {
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "ssid"
+            ],
+            "properties": {
+              "ssid": {
+                "type": "string",
+                "example": "Astrogate_5G"
+              },
+              "password": {
+                "type": "string",
+                "example": "83566024",
+                "description": "Required when security is selected"
+              },
+              "eapMethod": {
+                "type": "string",
+                "example": "PEAP",
+                "enum": [
+                  "PEAP",
+                  "TTLS"
+                ],
+                "description": "EAP method. Required when security is 802.1xEAP."
+              },
+              "phase": {
+                "type": "string",
+                "example": "MSCHAPV2",
+                "enum": [
+                  "MSCHAPV2",
+                  "GTC",
+                  "PAP",
+                  "MSCHAP"
+                ],
+                "description": "Phase 2 authentication. PEAP: MSCHAPV2 or GTC; TTLS: MSCHAPV2, GTC, PAP or MSCHAP. Required when security is 802.1xEAP."
+              },
+              "identity": {
+                "type": "string",
+                "example": "user01",
+                "description": "Identity (user name) for 802.1xEAP. Required when security is 802.1xEAP."
+              },
+              "isStaticIp": {
+                "type": "boolean",
+                "example": true,
+                "description": "Only true requires filling in static IP related information"
+              },
+              "reconnect": {
+                "type": "boolean",
+                "example": true
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/StaticIPConfiguration"
+          }
+        ]
+      },
+      "EthernetSetting": {
+        "type": "object",
+        "properties": {
+          "eth0": {
+            "$ref": "#/components/schemas/EthernetInfo"
+          },
+          "eth1": {
+            "$ref": "#/components/schemas/EthernetInfo"
+          }
+        }
+      },
+      "EthernetInfo": {
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "enableDHCP"
+            ],
+            "properties": {
+              "enableDHCP": {
+                "type": "boolean",
+                "example": false,
+                "description": "true: DHCP, false: static IP (all address fields required; dns2 can be 0.0.0.0)"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/StaticIPConfiguration"
+          }
+        ]
+      },
+      "EthernetStatus": {
+        "description": "Address fields are empty strings when the port is not connected and has no stored static IP.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "connected": {
+                "type": "boolean",
+                "example": true,
+                "description": "Whether the port has an IP address"
+              },
+              "enableDHCP": {
+                "type": "boolean",
+                "example": true,
+                "description": "true: DHCP, false: static IP"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/StaticIPConfiguration"
+          }
+        ]
+      },
+      "StaticIPConfiguration": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "format": "ipv4",
+            "example": "192.168.125.153"
+          },
+          "mask": {
+            "type": "string",
+            "format": "ipv4",
+            "example": "255.255.255.0"
+          },
+          "gateway": {
+            "type": "string",
+            "format": "ipv4",
+            "example": "192.168.125.1"
+          },
+          "dns1": {
+            "type": "string",
+            "format": "ipv4",
+            "example": "168.95.1.1"
+          },
+          "dns2": {
+            "type": "string",
+            "format": "ipv4",
+            "example": "8.8.8.8"
+          }
+        }
+      },
+      "PodInfo": {
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "type": "integer",
+            "example": 0,
+            "description": "0(this station), 1(other)"
+          },
+          "ssid": {
+            "type": "string",
+            "example": "Astrogate_Unknown"
+          },
+          "security": {
+            "type": "integer",
+            "example": 0,
+            "description": "0(none), 1(WPA2), 2(WPA3), 3(WPA3/WPA2 mixed mode)"
+          },
+          "password": {
+            "type": "string",
+            "example": "qwer!!test",
+            "description": "No restrictions, as the user's SSID password may contain various special characters"
+          },
+          "channel": {
+            "type": "integer",
+            "enum": [
+              0,
+              36,
+              40,
+              44,
+              48,
+              149,
+              153,
+              157,
+              161
+            ],
+            "example": 44,
+            "description": "5GHz Wi-Fi channel for fast boot. 0=disabled"
+          },
+          "autoProjection": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "ServiceInfo": {
+        "type": "object",
+        "properties": {
+          "allowMiracast": {
+            "type": "boolean",
+            "example": false
+          },
+          "allowGoogleCast": {
+            "type": "boolean",
+            "example": true
+          },
+          "allowAirPlay": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "CameraState": {
+        "type": "object",
+        "description": "CAMERA_STATE payload forwarded as-is from the receiver",
+        "properties": {
+          "layout": {
+            "type": "integer",
+            "description": "0 = Side by Side, 1 = Picture in Picture, 2 = Full Screen"
+          },
+          "position": {
+            "type": "integer",
+            "description": "PIP corner: 0 = top-left, 1 = top-right, 2 = bottom-left, 3 = bottom-right"
+          },
+          "swap": {
+            "type": "boolean",
+            "description": "Main/sub camera swapped. Does not change camera1/camera2 names"
+          },
+          "on": {
+            "type": "boolean",
+            "description": "Camera projection active"
+          },
+          "fullScreen": {
+            "type": "boolean"
+          },
+          "resolutionMode": {
+            "type": "integer",
+            "description": "0 = 720P, 1 = 1080P"
+          },
+          "cameraCount": {
+            "type": "integer",
+            "description": "Connected UVC cameras: 0 / 1 / 2. First plugged becomes camera 1"
+          },
+          "camera1": {
+            "type": "string",
+            "nullable": true,
+            "description": "Product name, may be null (UI shows fallback)"
+          },
+          "camera2": {
+            "type": "string",
+            "nullable": true
+          },
+          "bandwidthWarning": {
+            "type": "boolean",
+            "description": "USB bandwidth insufficient, second camera unusable"
+          },
+          "canLayout": {
+            "type": "boolean"
+          },
+          "canSwap": {
+            "type": "boolean"
+          },
+          "canFullScreen": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StationStatus": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "busy",
+              "updating"
+            ],
+            "description": "ready also covers the station being asleep"
+          },
+          "name": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "fwVersion": {
+            "type": "string"
+          },
+          "network": {
+            "type": "object",
+            "properties": {
+              "lan1": {
+                "$ref": "#/components/schemas/NetworkPort"
+              },
+              "lan2": {
+                "$ref": "#/components/schemas/NetworkPort"
+              },
+              "wifi": {
+                "$ref": "#/components/schemas/NetworkPort"
+              }
+            }
+          }
+        }
+      },
+      "NetworkPort": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "IPv4 address to reach the station through this interface; the bridge address when the interface is bridged; empty when unavailable"
+          },
+          "mac": {
+            "type": "string",
+            "description": "MAC address of the interface itself"
+          }
+        }
+      },
+      "SessionSummary": {
+        "type": "object",
+        "properties": {
+          "sharing": {
+            "type": "boolean"
+          },
+          "presenterCount": {
+            "type": "integer",
+            "description": "Streams currently playing or paused on screen"
+          },
+          "connectedCount": {
+            "type": "integer",
+            "description": "Distinct connected clients including presenters and remote viewers"
+          },
+          "viewerCount": {
+            "type": "integer",
+            "description": "Remote-view viewers (web + app)"
+          },
+          "sources": {
+            "type": "array",
+            "description": "Distinct sharing methods currently presenting, in stream order",
+            "items": {
+              "type": "string",
+              "enum": [
+                "App",
+                "Pod",
+                "Ipad Pro",
+                "Browser Sharing",
+                "AirPlay",
+                "GoogleCast",
+                "Miracast",
+                "Wired Sharing",
+                "Unknown"
+              ]
+            }
+          }
+        }
+      },
+      "PeripheralGroup": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Peripherals": {
+        "type": "object",
+        "properties": {
+          "camera": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PeripheralGroup"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "bandwidthWarning": {
+                    "type": "boolean",
+                    "description": "USB bandwidth is insufficient for the second camera"
+                  }
+                }
+              }
+            ]
+          },
+          "speaker": {
+            "$ref": "#/components/schemas/PeripheralGroup"
+          },
+          "microphone": {
+            "$ref": "#/components/schemas/PeripheralGroup"
+          }
+        }
+      },
+      "VideoOutputStatus": {
+        "type": "object",
+        "properties": {
+          "dualDisplay": {
+            "type": "boolean",
+            "description": "true = extended, false = mirrored (Resolution page setting). AS-301 only"
+          },
+          "hdmi": {
+            "$ref": "#/components/schemas/VideoPort"
+          },
+          "typeC": {
+            "$ref": "#/components/schemas/VideoPort"
+          }
+        }
+      },
+      "VideoPort": {
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Actual output mode like 1920x1080, empty when inactive"
+          }
+        }
+      },
+      "CameraSetting": {
+        "type": "object",
+        "description": "At least one of layout / swap is required",
+        "properties": {
+          "layout": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2,
+            "example": 1
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3,
+            "description": "Only meaningful when layout = 1; defaults to 0",
+            "example": 3
+          },
+          "swap": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "PasswordInfo": {
+        "type": "object",
+        "required": [
+          "old",
+          "new"
+        ],
+        "properties": {
+          "old": {
+            "type": "string",
+            "example": "admin",
+            "pattern": "^[A-Za-z0-9]{1,16}$"
+          },
+          "new": {
+            "type": "string",
+            "example": "admin233",
+            "pattern": "^[A-Za-z0-9]{1,16}$"
+          },
+          "confirm": {
+            "type": "string",
+            "example": "admin233",
+            "description": "Must be the same as new"
+          }
+        }
+      },
+      "PowerInfo": {
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "type": "integer",
+            "example": 0,
+            "description": "0(sleep mode), 1(suspend mode)",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "time": {
+            "type": "integer",
+            "example": 5,
+            "description": "Sleep timer (only when mode=0). -1=disabled, 1=10s, others are in minutes",
+            "enum": [
+              -1,
+              1,
+              5,
+              15,
+              30,
+              60
+            ]
+          }
+        }
+      },
+      "ApiKeyInfo": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]{16}$",
+            "example": "zxcvfdsa1234rewq"
+          }
+        }
+      },
+      "ErrorCode": {
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "type": "integer",
+            "format": "int32",
+            "enum": [
+              0,
+              1000,
+              1001,
+              1002,
+              1003,
+              1004,
+              1005,
+              1100,
+              1200
+            ],
+            "x-enum-descriptions": [
+              "0,Success",
+              "1000,Fail",
+              "1001,User or APP Key is unavailable",
+              "1002,API internal exception",
+              "1003,Lack parameter",
+              "1004,Basic Auth or APP Key is unavailable",
+              "1005,User or password is unavailable",
+              "1100,The input value is unavailable",
+              "1200,The input file is unavailable"
+            ],
+            "example": 0
+          }
+        }
+      },
+      "GeneralResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "errorCode",
+          "isSuccess",
+          "model",
+          "rebootRequired"
+        ],
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "boolean",
+                "example": true
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "errorMsg": {
+                "type": "string",
+                "example": ""
+              },
+              "isSuccess": {
+                "type": "boolean",
+                "example": true
+              },
+              "model": {
+                "type": "string",
+                "example": "AS-301"
+              },
+              "rebootRequired": {
+                "type": "boolean",
+                "example": false,
+                "description": "The device needs to reboot to apply this new change."
+              }
+            }
+          }
+        ]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "errorCode",
+          "isSuccess",
+          "model",
+          "rebootRequired"
+        ],
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "example": "6LcUyH4I4EKpAqIo"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "errorMsg": {
+                "type": "string",
+                "example": ""
+              },
+              "isSuccess": {
+                "type": "boolean",
+                "example": true
+              },
+              "model": {
+                "type": "string",
+                "example": "AS-301"
+              },
+              "rebootRequired": {
+                "type": "boolean",
+                "example": false,
+                "description": "The device needs to reboot to apply this new change."
+              }
+            }
+          }
+        ]
+      }
+    },
+    "examples": {
+      "success_login": {
+        "summary": "Success",
+        "value": {
+          "data": {
+            "token": "6LcUyH4I4EKpAqIo"
+          },
+          "errorCode": 0,
+          "isSuccess": true,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "success_0": {
+        "summary": "Success",
+        "value": {
+          "data": true,
+          "errorCode": 0,
+          "isSuccess": true,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1000": {
+        "summary": "Failed",
+        "value": {
+          "data": "",
+          "errorCode": 1000,
+          "errorMsg": "Fail",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1000_updating": {
+        "summary": "Firmware updating",
+        "value": {
+          "data": "",
+          "errorCode": 1000,
+          "errorMsg": "Fail: firmware updating",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1001": {
+        "summary": "User or APP Key is unavailable",
+        "value": {
+          "data": "",
+          "errorCode": 1001,
+          "errorMsg": "User or APP Key is unavailable",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1002": {
+        "summary": "API internal exception",
+        "value": {
+          "data": "",
+          "errorCode": 1002,
+          "errorMsg": "API internal exception",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1003": {
+        "summary": "Lack parameter",
+        "value": {
+          "data": "",
+          "errorCode": 1003,
+          "errorMsg": "Lack parameter",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1004": {
+        "summary": "Basic Auth or APP Key is unavailable",
+        "value": {
+          "data": "",
+          "errorCode": 1004,
+          "errorMsg": "Basic Auth or APP Key is unavailable",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1005": {
+        "summary": "User or password is unavailable",
+        "value": {
+          "data": "",
+          "errorCode": 1005,
+          "errorMsg": "User or password is unavailable",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1100": {
+        "summary": "The input value is unavailable",
+        "value": {
+          "data": "",
+          "errorCode": 1100,
+          "errorMsg": "The input value is unavailable",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      },
+      "failed_1200": {
+        "summary": "The input file is unavailable",
+        "value": {
+          "data": "",
+          "errorCode": 1200,
+          "errorMsg": "The input file is unavailable",
+          "isSuccess": false,
+          "model": "AS-301",
+          "rebootRequired": false
+        }
+      }
+    },
+    "parameters": {
+      "userParameter": {
+        "name": "username",
+        "example": "admin",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "idParameter": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Default wallpapers 0 and 1 cannot be replaced or deleted.",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 2,
+          "maximum": 7,
+          "enum": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "description": "Send the token returned by POST /api/v2/station/login in the X-API-KEY header.",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}
